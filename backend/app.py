@@ -134,4 +134,6 @@ def create_course():
         return jsonify(response.json()), 201
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 8000)))
+    # Get port from environment variable or use a default
+    port = int(os.environ.get('PORT', 0))  # Using 0 lets the OS assign a random available port
+    app.run(host='0.0.0.0', port=port)
