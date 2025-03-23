@@ -1,0 +1,12 @@
+C:\Users\Pepe\Documents\codigos\club-poliglota\server\target\debug\deps\libyansi-e92a09aefdfb57e3.rmeta: C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\lib.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\macros.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\windows.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\paint.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\style.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\color.rs
+
+C:\Users\Pepe\Documents\codigos\club-poliglota\server\target\debug\deps\libyansi-e92a09aefdfb57e3.rlib: C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\lib.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\macros.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\windows.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\paint.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\style.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\color.rs
+
+C:\Users\Pepe\Documents\codigos\club-poliglota\server\target\debug\deps\yansi-e92a09aefdfb57e3.d: C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\lib.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\macros.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\windows.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\paint.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\style.rs C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\color.rs
+
+C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\lib.rs:
+C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\macros.rs:
+C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\windows.rs:
+C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\paint.rs:
+C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\style.rs:
+C:\Users\Pepe\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\yansi-0.5.1\src\color.rs:
