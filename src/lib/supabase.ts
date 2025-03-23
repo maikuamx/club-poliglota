@@ -1,6 +1,31 @@
 import { createClient } from '@supabase/supabase-js';
+import { Database } from '../types/supabase';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+let supabaseUrl: string;
+let supabaseAnonKey: string;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+async function initializeSupabase() {
+  try {
+    const response = await fetch('/api/config');
+    const config = await response.json();
+    
+    supabaseUrl = config.SUPABASE_URL;
+    supabaseAnonKey = config.SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Missing Supabase configuration from server');
+    }
+  } catch (error) {
+    console.error('Failed to fetch Supabase configuration:', error);
+    throw error;
+  }
+}
+
+export const getSupabaseClient = async () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    await initializeSupabase();
+  }
+  return createClient<Database>(supabaseUrl, supabaseAnonKey);
+};
+
+export const supabase = await getSupabaseClient();

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
-import { User } from '../types';
 import { supabase } from '../lib/supabase';
+import { Database } from '../types/supabase';
+
+type User = Database['public']['Tables']['users']['Row'];
 
 interface AuthState {
   user: User | null;
@@ -20,7 +22,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       password,
     });
     if (error) throw error;
-    set({ user: data.user as User });
+
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (userError) throw userError;
+    set({ user: userData });
   },
   signOut: async () => {
     await supabase.auth.signOut();
