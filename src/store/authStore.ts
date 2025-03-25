@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { initSupabase } from '../lib/supabase';
-import { Database } from '../types/supabase';
+import type { Database } from '../types/supabase';
 
 type User = Database['public']['Tables']['users']['Row'];
 
@@ -14,64 +13,67 @@ interface AuthState {
   signOut: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+const BACKEND_URL = 'https://club-poliglota.onrender.com';
+
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
   initialized: false,
   setUser: (user) => set({ user, loading: false }),
   initialize: async () => {
-    if (get().initialized) return;
+    if (useAuthStore.getState().initialized) return;
     
     try {
-      const client = await initSupabase();
-      const { data: { user } } = await client.auth.getUser();
-      
-      if (user) {
-        const { data: userData } = await client
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-          
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        set({ loading: false, initialized: true });
+        return;
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/auth/verify`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
         set({ user: userData, loading: false, initialized: true });
       } else {
+        localStorage.removeItem('auth_token');
         set({ user: null, loading: false, initialized: true });
       }
     } catch (error) {
       console.error('Failed to initialize auth store:', error);
+      localStorage.removeItem('auth_token');
       set({ loading: false, initialized: true });
     }
   },
   signIn: async (email, password) => {
     try {
-      const client = await initSupabase();
-      const { data, error } = await client.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
       });
-      if (error) throw error;
 
-      const { data: userData, error: userError } = await client
-        .from('users')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Invalid credentials');
+      }
 
-      if (userError) throw userError;
-      set({ user: userData });
+      const { token, user } = await response.json();
+      localStorage.setItem('auth_token', token);
+      set({ user });
     } catch (error) {
       console.error('Failed to sign in:', error);
       throw error;
     }
   },
   signOut: async () => {
-    try {
-      const client = await initSupabase();
-      await client.auth.signOut();
-      set({ user: null });
-    } catch (error) {
-      console.error('Failed to sign out:', error);
-      throw error;
-    }
+    localStorage.removeItem('auth_token');
+    set({ user: null });
   },
 }));

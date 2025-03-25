@@ -32,14 +32,14 @@ export function Hero() {
               href="#contact"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="glass-effect px-8 py-4 rounded-full text-[#2D235F] font-semibold flex items-center justify-center group"
+              className="glass-effect px-8 py-4 rounded-full text-white font-semibold flex items-center justify-center group"
             >
               Comienza Ahora
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </motion.a>
             
             <motion.a
-              href="https://wa.me/+1234567890"
+              href="https://wa.me/+6143977741"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
@@ -99,13 +99,13 @@ export function Hero() {
               title: "Francés",
               schedule: "Lunes, Miércoles y Viernes",
               time: "5:00 PM - 6:30 PM",
-              image: "https://images.unsplash.com/photo-1509041322357-8a3f9757a475?auto=format&fit=crop&q=80"
+              image: "/france-bg.jpg"
             },
             {
               title: "Inglés",
               schedule: "Martes y Jueves",
               time: "5:00 PM - 6:30 PM",
-              image: "https://images.unsplash.com/photo-1526857240824-92be52bed6bd?auto=format&fit=crop&q=80"
+              image: "/england-bg.jpg"
             }
           ].map((course, index) => (
             <motion.div

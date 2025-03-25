@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import httpx
 from functools import wraps
+import bcrypt
 
 load_dotenv()
 
@@ -63,32 +64,35 @@ def get_config():
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
     
     with supabase_client() as client:
-        # Authenticate with Supabase
-        auth_response = client.post(
-            '/auth/v1/token?grant_type=password',
-            json={
-                'email': data['email'],
-                'password': data['password']
+        # Get user from database
+        response = client.get(
+            '/rest/v1/users',
+            params={
+                'email': f'eq.{email}',
+                'select': '*'
             }
         )
         
-        if auth_response.status_code != 200:
+        if response.status_code != 200:
+            return jsonify({'error': 'Failed to fetch user'}), 500
+        
+        users = response.json()
+        if not users:
             return jsonify({'error': 'Invalid credentials'}), 401
         
-        auth_data = auth_response.json()
-        user_id = auth_data['user']['id']
+        user = users[0]
+        stored_hash = user['password_hash'].replace('$2a$', '$2b$')
         
-        # Get user details
-        user_response = client.get(f'/rest/v1/users?id=eq.{user_id}&select=*')
-        if user_response.status_code != 200:
-            return jsonify({'error': 'Failed to fetch user details'}), 500
-        
-        user = user_response.json()[0]
+        # Verify password using bcrypt
+        if not bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
+            return jsonify({'error': 'Invalid credentials'}), 401
         
         # Create JWT token
-        access_token = create_access_token(identity=user_id)
+        access_token = create_access_token(identity=user['id'])
         
         return jsonify({
             'token': access_token,
@@ -98,6 +102,35 @@ def login():
                 'name': user['name'],
                 'role': user['role']
             }
+        })
+
+@app.route('/api/auth/verify', methods=['GET'])
+@jwt_required()
+def verify_token():
+    current_user_id = get_jwt_identity()
+    
+    with supabase_client() as client:
+        response = client.get(
+            '/rest/v1/users',
+            params={
+                'id': f'eq.{current_user_id}',
+                'select': '*'
+            }
+        )
+        
+        if response.status_code != 200:
+            return jsonify({'error': 'Failed to fetch user'}), 500
+        
+        users = response.json()
+        if not users:
+            return jsonify({'error': 'User not found'}), 404
+        
+        user = users[0]
+        return jsonify({
+            'id': user['id'],
+            'email': user['email'],
+            'name': user['name'],
+            'role': user['role']
         })
 
 @app.route('/api/courses', methods=['GET'])
@@ -134,6 +167,5 @@ def create_course():
         return jsonify(response.json()), 201
 
 if __name__ == '__main__':
-    # Get port from environment variable or use a default
-    port = int(os.environ.get('PORT', 0))  # Using 0 lets the OS assign a random available port
+    port = int(os.environ.get('PORT', 0))
     app.run(host='0.0.0.0', port=port)
