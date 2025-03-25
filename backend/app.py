@@ -8,11 +8,22 @@ import httpx
 from functools import wraps
 import bcrypt
 import secrets
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:5173", "https://club-poliglota.netlify.app"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 # Configuration
 if not os.getenv('JWT_SECRET_KEY'):
@@ -68,46 +79,62 @@ def get_config():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-    
-    with supabase_client() as client:
-        # Get user from database
-        response = client.get(
-            '/rest/v1/users',
-            params={
-                'email': f'eq.{email}',
-                'select': '*'
-            }
-        )
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
         
-        if response.status_code != 200:
-            return jsonify({'error': 'Failed to fetch user'}), 500
+        logger.debug(f"Login attempt for email: {email}")
         
-        users = response.json()
-        if not users:
-            return jsonify({'error': 'Invalid credentials'}), 401
-        
-        user = users[0]
-        stored_hash = user['password_hash'].replace('$2a$', '$2b$')
-        
-        # Verify password using bcrypt
-        if not bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
-            return jsonify({'error': 'Invalid credentials'}), 401
-        
-        # Create JWT token
-        access_token = create_access_token(identity=user['id'])
-        
-        return jsonify({
-            'token': access_token,
-            'user': {
-                'id': user['id'],
-                'email': user['email'],
-                'name': user['name'],
-                'role': user['role']
-            }
-        })
+        with supabase_client() as client:
+            # Get user from database
+            response = client.get(
+                '/rest/v1/users',
+                params={
+                    'email': f'eq.{email}',
+                    'select': '*'
+                }
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"Failed to fetch user: {response.text}")
+                return jsonify({'error': 'Failed to fetch user'}), 500
+            
+            users = response.json()
+            if not users:
+                logger.warning(f"No user found for email: {email}")
+                return jsonify({'error': 'Invalid credentials'}), 401
+            
+            user = users[0]
+            
+            # Authenticate with Supabase
+            auth_response = client.post(
+                '/auth/v1/token?grant_type=password',
+                json={
+                    'email': email,
+                    'password': password
+                }
+            )
+            
+            if auth_response.status_code != 200:
+                logger.warning(f"Supabase authentication failed for email: {email}")
+                return jsonify({'error': 'Invalid credentials'}), 401
+            
+            # Create JWT token
+            access_token = create_access_token(identity=user['id'])
+            
+            return jsonify({
+                'token': access_token,
+                'user': {
+                    'id': user['id'],
+                    'email': user['email'],
+                    'name': user['name'],
+                    'role': user['role']
+                }
+            })
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/auth/verify', methods=['GET'])
 @jwt_required()
