@@ -4,13 +4,8 @@ import { motion } from 'framer-motion';
 import { Student } from '../../types';
 
 export function StudentsList() {
-  const [showAddModal, setShowAddModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [students, setStudents] = useState<Student[]>([]);
-
-  const handleAddStudent = (student: Omit<Student, 'id' | 'joinedAt'>) => {
-    // Implementation will be added with Supabase integration
-  };
+  const [students] = useState<Student[]>([]);
 
   return (
     <div>
@@ -19,7 +14,6 @@ export function StudentsList() {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setShowAddModal(true)}
           className="bg-[#FF6B35] text-white px-4 py-2 rounded-md flex items-center"
         >
           <UserPlus className="h-5 w-5 mr-2" />

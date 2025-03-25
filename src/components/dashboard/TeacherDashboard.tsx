@@ -6,10 +6,18 @@ import { RecordingsList } from './RecordingsList';
 import { Forum } from './Forum';
 import { CourseManagement } from './CourseManagement';
 
-export function TeacherDashboard() {
-  const [activeTab, setActiveTab] = React.useState<'students' | 'recordings' | 'forum' | 'courses'>('students');
+type TabId = 'students' | 'recordings' | 'forum' | 'courses';
 
-  const tabs = [
+interface Tab {
+  id: TabId;
+  label: string;
+  icon: React.ElementType;
+}
+
+export function TeacherDashboard() {
+  const [activeTab, setActiveTab] = React.useState<TabId>('students');
+
+  const tabs: Tab[] = [
     { id: 'students', label: 'Estudiantes', icon: Users },
     { id: 'recordings', label: 'Grabaciones', icon: Video },
     { id: 'forum', label: 'Foro', icon: MessageSquare },
@@ -27,7 +35,7 @@ export function TeacherDashboard() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => setActiveTab(tab.id)}
                     className={`
                       flex-1 px-4 py-4 text-center border-b-2 font-medium text-sm
                       ${activeTab === tab.id

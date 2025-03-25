@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import React from 'react';
 import { Plus, Link as LinkIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Course } from '../../types';
 
 export function CourseManagement() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [courses] = React.useState<Course[]>([]);
 
   return (
     <div>
@@ -14,7 +13,6 @@ export function CourseManagement() {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setShowAddModal(true)}
           className="bg-[#FF6B35] text-white px-4 py-2 rounded-md flex items-center"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -57,13 +55,11 @@ export function CourseManagement() {
 
               <div className="mt-6 flex space-x-4">
                 <button
-                  onClick={() => {/* Handle edit */}}
                   className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-md"
                 >
                   Editar
                 </button>
                 <button
-                  onClick={() => {/* Handle update Zoom link */}}
                   className="flex-1 bg-[#FF6B35] hover:bg-opacity-90 text-white font-medium py-2 rounded-md"
                 >
                   Actualizar Zoom

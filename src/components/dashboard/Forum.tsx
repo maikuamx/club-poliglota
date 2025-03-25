@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import React from 'react';
 import { Plus, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ForumPost } from '../../types';
 
 export function Forum() {
-  const [posts, setPosts] = useState<ForumPost[]>([]);
-  const [showNewPostModal, setShowNewPostModal] = useState(false);
+  const [posts] = React.useState<ForumPost[]>([]);
 
   return (
     <div>
@@ -14,7 +13,6 @@ export function Forum() {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setShowNewPostModal(true)}
           className="bg-[#FF6B35] text-white px-4 py-2 rounded-md flex items-center"
         >
           <Plus className="h-5 w-5 mr-2" />

@@ -1,15 +1,10 @@
-import { useState } from 'react';
+import React from 'react';
 import { Plus, Video, Calendar, Clock, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Recording } from '../../types';
 
 export function RecordingsList() {
-  const [recordings, setRecordings] = useState<Recording[]>([]);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-
-  const handleUpload = async (file: File) => {
-    // Implementation will be added with Supabase storage integration
-  };
+  const [recordings] = React.useState<Recording[]>([]);
 
   return (
     <div>
@@ -18,7 +13,6 @@ export function RecordingsList() {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setShowUploadModal(true)}
           className="bg-[#FF6B35] text-white px-4 py-2 rounded-md flex items-center"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -40,7 +34,6 @@ export function RecordingsList() {
                   <h3 className="ml-2 text-lg font-medium text-gray-900">{recording.title}</h3>
                 </div>
                 <button
-                  onClick={() => {/* Handle delete */}}
                   className="text-gray-400 hover:text-red-500"
                 >
                   <Trash2 className="h-5 w-5" />
