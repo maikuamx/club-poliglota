@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import httpx
 from functools import wraps
 import bcrypt
+import secrets
 
 load_dotenv()
 
@@ -14,6 +15,10 @@ app = Flask(__name__)
 CORS(app)
 
 # Configuration
+if not os.getenv('JWT_SECRET_KEY'):
+    # Generate a secure random key if not set
+    os.environ['JWT_SECRET_KEY'] = secrets.token_hex(32)
+
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 
