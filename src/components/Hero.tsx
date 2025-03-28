@@ -2,7 +2,11 @@ import { BookOpen, Users, Globe2, Clock, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function Hero() {
-
+  const handleWhatsAppClick = () => {
+    const message = "¡Hola! Me interesa tomar clases con ustedes. ¿Podrían brindarme más información?";
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/6143977741?text=${encodedMessage}`, '_blank');
+  };
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#2D235F] to-[#E5E3F3] py-20 sm:py-32">
@@ -38,16 +42,14 @@ export function Hero() {
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </motion.a>
             
-            <motion.a
-              href="https://wa.me/+6143977741"
-              target="_blank"
-              rel="noopener noreferrer"
+            <motion.button
+              onClick={handleWhatsAppClick}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-[#FF6B35] px-8 py-4 rounded-full text-white font-semibold hover:bg-opacity-90 transition-colors flex items-center justify-center"
             >
               Contactar por WhatsApp
-            </motion.a>
+            </motion.button>
           </div>
         </motion.div>
 

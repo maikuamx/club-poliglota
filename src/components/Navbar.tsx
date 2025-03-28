@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Menu, Globe, LogIn, X, LogOut, User } from 'lucide-react';
+import { Menu, LogIn, X, LogOut, User } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
+import { Logo } from './Logo';
 
 export function Navbar() {
   const location = useLocation();
@@ -33,9 +34,8 @@ export function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Link to="/" className="flex items-center group">
-              <Globe className="h-8 w-8 text-[#F4D35E] group-hover:rotate-12 transition-transform duration-300" />
-              <span className="ml-2 text-xl font-bold">Club Políglota</span>
+            <Link to="/" className="flex items-center">
+              <Logo showText={false} />
             </Link>
           </motion.div>
           
