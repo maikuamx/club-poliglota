@@ -19,7 +19,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:5173", "https://club-poliglota.netlify.app"],
+        "origins": ["http://localhost:5173", "https://bucolic-blini-fc2661.netlify.app/"],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
@@ -27,7 +27,6 @@ CORS(app, resources={
 
 # Configuration
 if not os.getenv('JWT_SECRET_KEY'):
-    # Generate a secure random key if not set
     os.environ['JWT_SECRET_KEY'] = secrets.token_hex(32)
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
@@ -44,7 +43,6 @@ SUPABASE_ANON_KEY = os.getenv('SUPABASE_ANON_KEY')
 if not all([SUPABASE_URL, SUPABASE_KEY, SUPABASE_ANON_KEY]):
     raise ValueError("Missing Supabase environment variables")
 
-# Supabase client helper
 def supabase_client():
     return httpx.Client(
         base_url=SUPABASE_URL,
@@ -70,12 +68,60 @@ def admin_required(fn):
         return fn(*args, **kwargs)
     return wrapper
 
-@app.route('/api/config', methods=['GET'])
-def get_config():
-    return jsonify({
-        'VITE_SUPABASE_URL': SUPABASE_URL,
-        'VITE_SUPABASE_ANON_KEY': SUPABASE_ANON_KEY
-    })
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        name = data.get('name')
+        
+        logger.debug(f"Registration attempt for email: {email}")
+        
+        with supabase_client() as client:
+            # Create user in Supabase Auth
+            auth_response = client.post(
+                '/auth/v1/signup',
+                json={
+                    'email': email,
+                    'password': password
+                }
+            )
+            
+            if auth_response.status_code != 200:
+                logger.error(f"Failed to create auth user: {auth_response.text}")
+                return jsonify({'error': 'Registration failed'}), 400
+            
+            auth_user = auth_response.json()
+            
+            # Create user in public.users table
+            user_response = client.post(
+                '/rest/v1/users',
+                json={
+                    'id': auth_user['user']['id'],
+                    'email': email,
+                    'name': name,
+                    'role': 'student'  # Default role for new registrations
+                }
+            )
+            
+            if user_response.status_code != 201:
+                logger.error(f"Failed to create user record: {user_response.text}")
+                return jsonify({'error': 'Failed to create user record'}), 500
+            
+            return jsonify({
+                'message': 'Registration successful',
+                'user': {
+                    'id': auth_user['user']['id'],
+                    'email': email,
+                    'name': name,
+                    'role': 'student'
+                }
+            })
+            
+    except Exception as e:
+        logger.error(f"Registration error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
@@ -134,6 +180,48 @@ def login():
             })
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/enrollments', methods=['POST'])
+@jwt_required()
+@admin_required
+def create_enrollment():
+    try:
+        data = request.get_json()
+        student_id = data.get('student_id')
+        course_id = data.get('course_id')
+        
+        with supabase_client() as client:
+            # Verify student exists and is a student
+            student_response = client.get(
+                '/rest/v1/users',
+                params={
+                    'id': f'eq.{student_id}',
+                    'role': 'eq.student',
+                    'select': 'id'
+                }
+            )
+            
+            if not student_response.json():
+                return jsonify({'error': 'Invalid student ID'}), 400
+                
+            # Create enrollment
+            response = client.post(
+                '/rest/v1/enrollments',
+                json={
+                    'student_id': student_id,
+                    'course_id': course_id,
+                    'status': 'active'
+                }
+            )
+            
+            if response.status_code != 201:
+                return jsonify({'error': 'Failed to create enrollment'}), 500
+            
+            return jsonify(response.json()), 201
+            
+    except Exception as e:
+        logger.error(f"Enrollment error: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/auth/verify', methods=['GET'])
