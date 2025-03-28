@@ -83,43 +83,58 @@ def register():
         
         with supabase_client() as client:
             # Check if user already exists
-            existing_user = client.get(
+            existing_user_response = client.get(
                 '/rest/v1/users',
-                params={'email': f'eq.{email}', 'select': 'id'}
-            ).json()
+                params={
+                    'email': f'eq.{email}',
+                    'select': 'id'
+                }
+            )
             
+            if existing_user_response.status_code != 200:
+                logger.error(f"Failed to check existing user: {existing_user_response.text}")
+                return jsonify({'error': 'Failed to check existing user'}), 500
+                
+            existing_user = existing_user_response.json()
             if existing_user:
                 return jsonify({'error': 'Email already registered'}), 400
             
             # Generate password hash
-            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            salt = bcrypt.gensalt()
+            password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
             
             # Create user in public.users table
+            new_user = {
+                'email': email,
+                'password_hash': password_hash,
+                'name': name,
+                'role': 'student'  # Default role for new registrations
+            }
+            
             user_response = client.post(
                 '/rest/v1/users',
-                json={
-                    'email': email,
-                    'password_hash': password_hash,
-                    'name': name,
-                    'role': 'student'  # Default role for new registrations
-                }
+                json=new_user
             )
             
-            if user_response.status_code != 201:
-                logger.error(f"Failed to create user record: {user_response.text}")
-                return jsonify({'error': 'Failed to create user record'}), 500
+            if user_response.status_code not in [200, 201]:
+                logger.error(f"Failed to create user: {user_response.text}")
+                return jsonify({'error': 'Failed to create user'}), 500
             
-            user = user_response.json()[0]
+            created_user = user_response.json()[0] if isinstance(user_response.json(), list) else user_response.json()
+            
+            # Create access token
+            access_token = create_access_token(identity=created_user['id'])
             
             return jsonify({
                 'message': 'Registration successful',
+                'token': access_token,
                 'user': {
-                    'id': user['id'],
+                    'id': created_user['id'],
                     'email': email,
                     'name': name,
                     'role': 'student'
                 }
-            })
+            }), 201
             
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
