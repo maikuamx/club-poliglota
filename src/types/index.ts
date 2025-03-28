@@ -14,6 +14,9 @@ export interface Course {
   teacherId: string;
   description: string;
   zoomLink?: string;
+  schedule?: string;
+  maxStudents?: number;
+  enrollments?: { count: number }[];
 }
 
 export interface Recording {
@@ -23,6 +26,7 @@ export interface Recording {
   courseId: string;
   createdAt: string;
   expiresAt: string;
+  course: Course;
 }
 
 export interface ForumPost {
@@ -32,6 +36,8 @@ export interface ForumPost {
   language: 'english' | 'french';
   authorId: string;
   createdAt: string;
+  courseId: string;
+  course: Course;
   responses: ForumResponse[];
 }
 
@@ -50,4 +56,14 @@ export interface Student {
   language: 'english' | 'french';
   level: 'beginner' | 'intermediate' | 'advanced';
   joinedAt: string;
+  enrollments: Enrollment[];
+}
+
+export interface Enrollment {
+  id: string;
+  studentId: string;
+  courseId: string;
+  enrolledAt: string;
+  status: 'active' | 'inactive' | 'completed';
+  course: Course;
 }

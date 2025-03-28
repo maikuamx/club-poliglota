@@ -23,8 +23,8 @@ export function LoginForm() {
     setError('');
 
     try {
-      await signIn(email, password);
-      navigate('/');
+      const user = await signIn(email, password);
+      navigate(user.role === 'teacher' ? '/dashboard' : '/');
     } catch (err) {
       setError('Credenciales inválidas. Por favor, verifica tu email y contraseña.');
     } finally {

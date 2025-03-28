@@ -1,12 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, Video, MessageSquare, BookOpen } from 'lucide-react';
+import { Users, Video, MessageSquare, BookOpen, GraduationCap } from 'lucide-react';
 import { StudentsList } from './StudentsList';
 import { RecordingsList } from './RecordingsList';
 import { Forum } from './Forum';
 import { CourseManagement } from './CourseManagement';
+import { GroupManagement } from './GroupManagement';
 
-type TabId = 'students' | 'recordings' | 'forum' | 'courses';
+type TabId = 'students' | 'recordings' | 'forum' | 'courses' | 'groups';
 
 interface Tab {
   id: TabId;
@@ -19,14 +20,15 @@ export function TeacherDashboard() {
 
   const tabs: Tab[] = [
     { id: 'students', label: 'Estudiantes', icon: Users },
+    { id: 'groups', label: 'Grupos', icon: GraduationCap },
     { id: 'recordings', label: 'Grabaciones', icon: Video },
     { id: 'forum', label: 'Foro', icon: MessageSquare },
-    { id: 'courses', label: 'Cursos', icon: BookOpen },
+    { id: 'courses', label: 'Material', icon: BookOpen },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
@@ -61,6 +63,7 @@ export function TeacherDashboard() {
               transition={{ duration: 0.2 }}
             >
               {activeTab === 'students' && <StudentsList />}
+              {activeTab === 'groups' && <GroupManagement />}
               {activeTab === 'recordings' && <RecordingsList />}
               {activeTab === 'forum' && <Forum />}
               {activeTab === 'courses' && <CourseManagement />}

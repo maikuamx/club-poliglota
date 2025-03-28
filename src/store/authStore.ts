@@ -9,7 +9,7 @@ interface AuthState {
   initialized: boolean;
   setUser: (user: User | null) => void;
   initialize: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<User>;
   signOut: () => Promise<void>;
 }
 
@@ -67,6 +67,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { token, user } = await response.json();
       localStorage.setItem('auth_token', token);
       set({ user });
+      return user;
     } catch (error) {
       console.error('Failed to sign in:', error);
       throw error;
