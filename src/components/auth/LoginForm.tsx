@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,9 @@ export function LoginForm() {
   const [error, setError] = useState('');
   
   const signIn = useAuthStore((state) => state.signIn);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const registrationMessage = location.state?.message;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +24,7 @@ export function LoginForm() {
 
     try {
       await signIn(email, password);
+      navigate('/');
     } catch (err) {
       setError('Credenciales inválidas. Por favor, verifica tu email y contraseña.');
     } finally {
@@ -49,6 +54,16 @@ export function LoginForm() {
             Ingresa tus credenciales para acceder a tu cuenta
           </p>
         </div>
+
+        {registrationMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-green-50 border border-green-200 text-green-600 rounded-lg text-center"
+          >
+            {registrationMessage}
+          </motion.div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -128,16 +143,29 @@ export function LoginForm() {
             )}
           </motion.button>
 
-          <p className="text-center text-sm text-gray-600">
-            ¿Olvidaste tu contraseña?{' '}
-            <button
-              type="button"
-              onClick={() => {/* Handle password reset */}}
-              className="text-[#FF6B35] hover:underline font-medium"
-            >
-              Contacta al profesor
-            </button>
-          </p>
+          <div className="space-y-4">
+            <p className="text-center text-sm text-gray-600">
+              ¿No tienes una cuenta?{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/register')}
+                className="text-[#FF6B35] hover:underline font-medium"
+              >
+                Regístrate aquí
+              </button>
+            </p>
+
+            <p className="text-center text-sm text-gray-600">
+              ¿Olvidaste tu contraseña?{' '}
+              <button
+                type="button"
+                onClick={() => {/* Handle password reset */}}
+                className="text-[#FF6B35] hover:underline font-medium"
+              >
+                Contacta al profesor
+              </button>
+            </p>
+          </div>
         </form>
       </motion.div>
     </div>
