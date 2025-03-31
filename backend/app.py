@@ -19,7 +19,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:5173", "https://bucolic-blini-fc2661.netlify.app/"],
+        "origins": ["http://localhost:5173", "https://clubpoliglota.com.mx/"],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
